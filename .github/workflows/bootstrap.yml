@@ -3,6 +3,8 @@ name: Bootstrap Android news app
 on:
   push:
     branches: [ main ]
+    paths:
+      - '.github/workflows/bootstrap.yml'
 
 permissions:
   contents: write
@@ -24,19 +26,19 @@ jobs:
           path: template
 
       - name: Verify RSS feed
-        id: feed
         shell: bash
         run: |
           python3 - <<'PY' > feed.env
           import urllib.request
           candidates = ["https://www.eldiario.es/rss/"]
+          headers = {"User-Agent":"Mozilla/5.0 NoticiasAndroid/1.0", "Accept":"application/rss+xml,application/xml,text/xml,*/*"}
           for url in candidates:
               try:
-                  req = urllib.request.Request(url, headers={"User-Agent":"Mozilla/5.0 NoticiasAndroid/1.0", "Accept":"application/rss+xml,application/xml,text/xml,*/*"})
+                  req = urllib.request.Request(url, headers=headers)
                   with urllib.request.urlopen(req, timeout=20) as r:
-                      data = r.read(4096).lower()
-                      if b"<rss" in data or b"<channel" in data or b"<rdf:rdf" in data or b"<feed" in data:
-                          print("FEED_URL=" + url)
+                      data = r.read(8192).lower()
+                      if any(x in data for x in (b"<rss", b"<channel", b"<rdf:rdf", b"<feed")):
+                          print("FEED_URL=" + r.geturl())
                           raise SystemExit(0)
               except Exception as e:
                   print(f"# {url}: {e}")
@@ -51,17 +53,15 @@ jobs:
           APP_NAME: "Noticias elDiario.es"
           APP_ID: "com.rodrigosambade.noticias.eldiario"
           REPO_NAME: "noticias-eldiario"
+          MEDIA_NAME: "elDiario.es"
           GIST_REV: "ce7bd07ed17d10d48785a0c21527c8100ea6da7e"
         run: |
-          rsync -a --delete --exclude='.git' --exclude='.github' template/ target/
-          rm -rf target/.github
-          mkdir -p target/.github/workflows target/third_party/connectivity
+          rsync -a --exclude='.git' --exclude='.github' template/ target/
+          mkdir -p target/third_party/connectivity
 
-          # Vendor the COMPLETE, unmodified Java implementation from the requested gist.
           GIST_RAW="https://gist.githubusercontent.com/rodrigosambadesaa/729cca29a031fef4e2f15751863b655f/raw/${GIST_REV}/ConnectivityAndInternetAccess.java"
           curl --retry 3 --retry-all-errors -fsSL "$GIST_RAW" -o target/third_party/connectivity/ConnectivityAndInternetAccess.java
           cp target/third_party/connectivity/ConnectivityAndInternetAccess.java target/app/src/main/java/com/example/muyinteresante/util/ConnectivityAndInternetAccess.java
-          # Only adapt the package declaration in the compiled copy. The vendored copy above remains byte-for-byte as downloaded.
           sed -i 's/^package net\.i2p\.android\.router\.util;/package com.example.muyinteresante.util;/' target/app/src/main/java/com/example/muyinteresante/util/ConnectivityAndInternetAccess.java
 
           python3 - <<'PY'
@@ -104,53 +104,32 @@ jobs:
           cat > target/third_party/connectivity/README.md <<EOF
           # ConnectivityAndInternetAccess
 
-          This directory vendors the complete, unmodified Java implementation from:
+          Complete, unmodified vendored source from:
           https://gist.github.com/rodrigosambadesaa/729cca29a031fef4e2f15751863b655f
 
           Pinned revision: ${GIST_REV}
 
-          The Android source-set copy changes only the package declaration to
-          \`com.example.muyinteresante.util\`; all connectivity, DNS, HTTP(S), VPN,
-          captive-portal, network-observer and compatibility logic is retained.
+          The compiled Android copy changes only its package declaration to com.example.muyinteresante.util.
+          All connectivity, DNS, HTTP(S), VPN, captive-portal, network-observer and compatibility logic is retained.
           EOF
 
           cat > target/README.md <<EOF
           # ${APP_NAME}
 
-          Android RSS reader for **elDiario.es**, based on the working `practica-noticias-web-muy-interesante` project.
+          Independent Android RSS reader for ${MEDIA_NAME}.
 
           ## Features
           - Live RSS: ${FEED_URL}
-          - RecyclerView news list, search, refresh, sharing and article view
-          - Offline JSON/image cache
+          - RecyclerView list, search, pull-to-refresh, sharing and article view
+          - Offline JSON and image cache
           - Passive network observation and explicit connectivity diagnostics
-          - Complete ConnectivityAndInternetAccess gist vendored under `third_party/connectivity/`
-          - Android API 16+ / Java 8
+          - Complete ConnectivityAndInternetAccess gist vendored under third_party/connectivity
+          - Android API 16+ and Java 8
 
-          The app is an independent reader and is not an official elDiario.es application.
+          This is an independent reader and is not an official ${MEDIA_NAME} application.
           EOF
 
-          cat > target/.github/workflows/android-ci.yml <<'EOF'
-          name: Android CI
-          on:
-            push:
-              branches: [ main ]
-            pull_request:
-          jobs:
-            build:
-              runs-on: ubuntu-latest
-              steps:
-                - uses: actions/checkout@v4
-                - uses: actions/setup-java@v4
-                  with:
-                    distribution: temurin
-                    java-version: '17'
-                    cache: gradle
-                - run: chmod +x gradlew
-                - run: ./gradlew --no-daemon assembleDebug assembleRelease
-          EOF
-
-      - name: Compile APKs before publishing source
+      - name: Compile Debug and Release APKs
         working-directory: target
         run: |
           chmod +x gradlew
@@ -174,5 +153,6 @@ jobs:
           cp app/build/outputs/apk/release/app-release.apk noticias-eldiario-v1.0.0.apk
           gh release create v1.0.0 noticias-eldiario-v1.0.0.apk \
             --repo "$GITHUB_REPOSITORY" \
+            --target main \
             --title "v1.0.0 - Noticias elDiario.es" \
             --notes "Primera versión funcional: lector RSS, búsqueda, caché offline, diagnóstico de red y gist completo ConnectivityAndInternetAccess integrado."
