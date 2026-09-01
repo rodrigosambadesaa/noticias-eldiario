@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
     private static final String RSS_PAGE_URL = "https://www.eldiario.es/rss/";
     private static final int LOAD_MORE_THRESHOLD = 4;
     private static final int MAX_CONSECUTIVE_DUPLICATE_PAGES = 2;
+    private static final int NEWS_PAGE_SIZE = 20;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView rvNoticias;
@@ -59,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
     private boolean hasMoreNews = false;
     private int nextArchivePage = 2;
     private int consecutiveDuplicatePages = 0;
+    private final ArrayList<NoticiaRSS> noticiasDisponibles = new ArrayList<>();
+    private int noticiasVisibles = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -256,7 +259,11 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
         // Cargar desde caché offline primero para renderizado instantáneo
         ArrayList<NoticiaRSS> cached = NewsCacheManager.loadNewsFromCache(this);
         if (cached != null && !cached.isEmpty()) {
-            adapter.updateData(cached);
+            noticiasDisponibles.clear();
+            noticiasDisponibles.addAll(cached);
+            noticiasVisibles = Math.min(NEWS_PAGE_SIZE, noticiasDisponibles.size());
+            adapter.updateData(new ArrayList<>(noticiasDisponibles.subList(0, noticiasVisibles)));
+            hasMoreNews = noticiasVisibles < noticiasDisponibles.size();
             layoutEmptyState.setVisibility(View.GONE);
             rvNoticias.setVisibility(View.VISIBLE);
         }
@@ -303,6 +310,17 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
 
         if (!ConnectivityAndInternetAccess.isConnectedOrConnecting(this)) {
             Log.d(TAG, "No se cargan más noticias: sin conexión disponible.");
+            return;
+        }
+
+        // El RSS oficial ya entrega un lote amplio. Lo mostramos por páginas para
+        // que el usuario pueda recorrerlo de forma incremental sin repetir tráfico
+        // ni depender de una paginación que el endpoint no expone.
+        if (noticiasVisibles < noticiasDisponibles.size()) {
+            int nuevoLimite = Math.min(noticiasVisibles + NEWS_PAGE_SIZE, noticiasDisponibles.size());
+            adapter.appendData(new ArrayList<>(noticiasDisponibles.subList(noticiasVisibles, nuevoLimite)));
+            noticiasVisibles = nuevoLimite;
+            hasMoreNews = noticiasVisibles < noticiasDisponibles.size();
             return;
         }
 
@@ -386,14 +404,17 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
         swipeRefreshLayout.setRefreshing(false);
 
         if (listaNoticias != null && !listaNoticias.isEmpty()) {
-            adapter.updateData(listaNoticias);
-            NewsCacheManager.saveNewsToCache(this, listaNoticias);
+            noticiasDisponibles.clear();
+            noticiasDisponibles.addAll(listaNoticias);
+            noticiasVisibles = Math.min(NEWS_PAGE_SIZE, noticiasDisponibles.size());
+            adapter.updateData(new ArrayList<>(noticiasDisponibles.subList(0, noticiasVisibles)));
+            NewsCacheManager.saveNewsToCache(this, noticiasDisponibles);
             layoutEmptyState.setVisibility(View.GONE);
             rvNoticias.setVisibility(View.VISIBLE);
 
             // Una actualización completa reinicia el recorrido del archivo.
             nextArchivePage = 2;
-            hasMoreNews = false;
+            hasMoreNews = noticiasVisibles < noticiasDisponibles.size();
             isLoadingMore = false;
             consecutiveDuplicatePages = 0;
 
