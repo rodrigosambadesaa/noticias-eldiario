@@ -30,6 +30,8 @@ public class AsignaImagenDeURL extends AsyncTask<String,Void,Void> {
 	File f;
 	Context contexto;
 	private String currentUrl;
+	private boolean remoteSkippedOffline;
+	private boolean connectionAttemptStarted;
 
 	public AsignaImagenDeURL(ImageView img, Context c){
 		this.img = img;
@@ -41,8 +43,11 @@ public class AsignaImagenDeURL extends AsyncTask<String,Void,Void> {
 		super.onPreExecute();
 		mapaDeBits = null;
 		f = null;
-		if (contexto != null) {
+		if (contexto != null && !ConnectivityAndInternetAccess.isConnected(contexto)) {
+			remoteSkippedOffline = true;
+		} else if (contexto != null) {
 			ConnectivityAndInternetAccess.beginConnectionAttempt(contexto);
+			connectionAttemptStarted = true;
 		}
 	}
 
@@ -62,7 +67,7 @@ public class AsignaImagenDeURL extends AsyncTask<String,Void,Void> {
 					if (mapaDeBits != null) return null;
 				}
 
-				if (contexto != null && !ConnectivityAndInternetAccess.isConnectedOrConnecting(contexto)) {
+				if (remoteSkippedOffline || (contexto != null && !ConnectivityAndInternetAccess.isConnected(contexto))) {
 					return null;
 				}
 
@@ -205,7 +210,10 @@ public class AsignaImagenDeURL extends AsyncTask<String,Void,Void> {
 	@Override
 	protected void onPostExecute(Void result) {
 		super.onPostExecute(result);
-		ConnectivityAndInternetAccess.endConnectionAttempt();
+		if (connectionAttemptStarted) {
+			ConnectivityAndInternetAccess.endConnectionAttempt();
+			connectionAttemptStarted = false;
+		}
 		if (img != null) {
 			Object tag = img.getTag();
 			if (mapaDeBits != null && (tag == null || tag.equals(currentUrl))) {
@@ -217,7 +225,10 @@ public class AsignaImagenDeURL extends AsyncTask<String,Void,Void> {
 	@Override
 	protected void onCancelled() {
 		super.onCancelled();
-		ConnectivityAndInternetAccess.endConnectionAttempt();
+		if (connectionAttemptStarted) {
+			ConnectivityAndInternetAccess.endConnectionAttempt();
+			connectionAttemptStarted = false;
+		}
 		if (f != null && f.exists()) {
 			try { f.delete(); } catch(Exception ex){} 
 		}

@@ -21,6 +21,8 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.muyinteresante.util.ConnectivityAndInternetAccess;
+
 public class DetalleActivity extends AppCompatActivity {
 
     public static final String EXTRA_URL = "extra_url";
@@ -107,11 +109,19 @@ public class DetalleActivity extends AppCompatActivity {
         });
 
         if (articleUrl != null && !articleUrl.isEmpty()) {
-            webView.loadUrl(articleUrl);
+            cargarArticuloSiHayRed();
         } else {
             Toast.makeText(this, "URL no válida", Toast.LENGTH_SHORT).show();
             finish();
         }
+    }
+
+    private void cargarArticuloSiHayRed() {
+        if (!ConnectivityAndInternetAccess.isConnected(this)) {
+            Toast.makeText(this, "Sin conexión. No se puede cargar el artículo.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        webView.loadUrl(articleUrl);
     }
 
     @Override
@@ -129,7 +139,11 @@ public class DetalleActivity extends AppCompatActivity {
             return true;
         } else if (id == R.id.menu_actualizar) {
             if (webView != null) {
-                webView.reload();
+                if (ConnectivityAndInternetAccess.isConnected(this)) {
+                    webView.reload();
+                } else {
+                    Toast.makeText(this, "Sin conexión. No se puede actualizar el artículo.", Toast.LENGTH_SHORT).show();
+                }
             }
             return true;
         } else if (id == R.id.action_abrir_navegador || id == R.id.action_test_conectividad) {

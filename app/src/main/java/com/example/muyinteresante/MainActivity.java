@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.muyinteresante.util.ConnectivityAndInternetAccess;
+import com.example.muyinteresante.util.ConnectivityRequestPolicy;
 import com.example.muyinteresante.util.NewsCacheManager;
 import com.example.muyinteresanteNoTocar.DescargaNoticiasRSS;
 import com.example.muyinteresanteNoTocar.NoticiaRSS;
@@ -273,30 +274,17 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
     }
 
     private void ejecutarDescargarNoticias() {
-        // Comprobación rápida inicial de estado de red antes del sondeador activo
-        if (!ConnectivityAndInternetAccess.isConnectedOrConnecting(this)) {
+        // Guard barato; la petición RSS real es la prueba definitiva del feed.
+        if (!ConnectivityRequestPolicy.canStartRemoteRequest(
+                ConnectivityAndInternetAccess.isConnected(this))) {
             Toast.makeText(this, "Sin conexión disponible para iniciar la descarga.", Toast.LENGTH_SHORT).show();
             usarNoticiasOffline();
             return;
         }
 
         swipeRefreshLayout.setRefreshing(true);
-
-        // Sondeo activo DNS-first / HTTP probe del Gist
-        ConnectivityAndInternetAccess.checkInternetAsyncDefault(this, new ConnectivityAndInternetAccess.InternetCallback() {
-            @Override
-            public void onResult(ConnectivityAndInternetAccess.InternetResult result) {
-                if (result != null && result.isReachable()) {
-                    Log.d(TAG, "Conexión a internet verificada mediante sondeador DNS/HTTP (" + result.getElapsedMilliseconds() + "ms). Iniciando descarga RSS...");
-                    new DescargaNoticiasRSS(MainActivity.this, MainActivity.this).execute(RSS_URL, NoticiaRSS.RSS_MUY_INTERESANTE);
-                } else {
-                    swipeRefreshLayout.setRefreshing(false);
-                    Log.w(TAG, "Chequeo activo de internet falló");
-                    Toast.makeText(MainActivity.this, "Sin acceso a internet para descargar noticias.", Toast.LENGTH_SHORT).show();
-                    usarNoticiasOffline();
-                }
-            }
-        });
+        new DescargaNoticiasRSS(MainActivity.this, MainActivity.this)
+                .execute(RSS_URL, NoticiaRSS.RSS_MUY_INTERESANTE);
     }
 
     /**
@@ -305,11 +293,6 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
      */
     private void cargarMasNoticias() {
         if (isLoadingMore || !hasMoreNews || adapter == null) {
-            return;
-        }
-
-        if (!ConnectivityAndInternetAccess.isConnectedOrConnecting(this)) {
-            Log.d(TAG, "No se cargan más noticias: sin conexión disponible.");
             return;
         }
 
@@ -324,20 +307,17 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
             return;
         }
 
+        if (!ConnectivityRequestPolicy.canStartRemoteRequest(
+                ConnectivityAndInternetAccess.isConnected(this))) {
+            Log.d(TAG, "No se cargan más noticias: sin conexión disponible.");
+            return;
+        }
+
         isLoadingMore = true;
         final int pageToLoad = nextArchivePage;
         Log.d(TAG, "Solicitando noticias antiguas. Página RSS: " + pageToLoad);
 
-        ConnectivityAndInternetAccess.checkInternetAsyncDefault(this, new ConnectivityAndInternetAccess.InternetCallback() {
-            @Override
-            public void onResult(ConnectivityAndInternetAccess.InternetResult result) {
-                if (result == null || !result.isReachable()) {
-                    isLoadingMore = false;
-                    Log.w(TAG, "No se pudo verificar internet para cargar la página " + pageToLoad);
-                    return;
-                }
-
-                new DescargaNoticiasRSS(MainActivity.this, new iNoticiaRSS() {
+        new DescargaNoticiasRSS(MainActivity.this, new iNoticiaRSS() {
                     @Override
                     public void onRecibeNoticiasRSS(ArrayList<NoticiaRSS> listaNoticias) {
                         isLoadingMore = false;
@@ -382,8 +362,6 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
                         }
                     }
                 }, false).execute(RSS_PAGE_URL + pageToLoad, NoticiaRSS.RSS_MUY_INTERESANTE);
-            }
-        });
     }
 
     private void usarNoticiasOffline() {
@@ -421,6 +399,43 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
             Log.d(TAG, "Noticias recibidas con éxito: " + listaNoticias.size());
         } else {
             Toast.makeText(this, "No se pudieron obtener nuevas noticias del canal RSS", Toast.LENGTH_SHORT).show();
+            usarNoticiasOffline();
+        }
+    }
+
+    @Override
+    public void onError(DescargaNoticiasRSS.FetchError error) {
+        swipeRefreshLayout.setRefreshing(false);
+        boolean pagination = isLoadingMore;
+        isLoadingMore = false;
+
+        if (error != null && error.getKind() == DescargaNoticiasRSS.FailureKind.OFFLINE) {
+            usarNoticiasOffline();
+            return;
+        }
+
+        if (error != null && ConnectivityRequestPolicy.shouldDiagnoseAfterFailure(
+                false, error.requiresGeneralDiagnostic())) {
+            ConnectivityAndInternetAccess.checkInternetAsyncDefault(this,
+                    new ConnectivityAndInternetAccess.InternetCallback() {
+                        @Override
+                        public void onResult(ConnectivityAndInternetAccess.InternetResult result) {
+                            boolean generalInternet = result != null && result.isReachable();
+                            String message = ConnectivityRequestPolicy.classifyFeedFailure(generalInternet);
+                            Log.w(TAG, message, error.getCause());
+                            Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+                            if (!pagination) {
+                                usarNoticiasOffline();
+                            }
+                        }
+                    });
+            return;
+        }
+
+        String message = "El feed de noticias no está disponible en este momento.";
+        Log.w(TAG, message + " kind=" + (error != null ? error.getKind() : "unknown"));
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        if (!pagination) {
             usarNoticiasOffline();
         }
     }
