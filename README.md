@@ -27,7 +27,7 @@ Orientation changes are handled without recreating `MainActivity`, so the loaded
 news list and the current `RecyclerView` scroll position are preserved and no RSS
 request is started again.
 
-The main header uses a taller blue area: title/actions occupy the upper row and
+The main header uses a taller, higher-contrast blue area: title/actions occupy the upper row and
 network status sits below them inside the same header, preventing overlap on
 narrow screens and devices with status-bar insets.
 

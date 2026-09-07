@@ -36,9 +36,13 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:text="Noticias elDiario.es"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/header_text"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:shadowColor="#66000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="2" />
         </RelativeLayout>
 
     </android.support.v7.widget.Toolbar>
