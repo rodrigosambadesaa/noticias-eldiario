@@ -20,7 +20,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingRight="12dp">
+            android:paddingLeft="16dp"
+            android:paddingRight="72dp">
 
             <TextView
                 android:id="@+id/tvAppTitle"
@@ -31,40 +32,47 @@
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
                 android:textStyle="bold" />
-
-            <!-- Network Status Pill Badge -->
-            <LinearLayout
-                android:id="@+id/layoutNetworkStatusPill"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/bg_status_badge"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:focusable="true">
-
-                <View
-                    android:id="@+id/viewNetworkDot"
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:layout_marginRight="6dp"
-                    android:background="@color/status_online" />
-
-                <TextView
-                    android:id="@+id/tvNetworkStatusText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Online"
-                    android:textColor="@color/status_online"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
         </RelativeLayout>
 
     </android.support.v7.widget.Toolbar>
+
+    <!-- Dedicated status row avoids competing with the title and toolbar actions. -->
+    <LinearLayout
+        android:id="@+id/networkStatusBar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/bg_app"
+        android:gravity="center_vertical|right"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+        <LinearLayout
+            android:id="@+id/layoutNetworkStatusPill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_status_badge"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <View
+                android:id="@+id/viewNetworkDot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginRight="6dp"
+                android:background="@color/status_online" />
+
+            <TextView
+                android:id="@+id/tvNetworkStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Online"
+                android:textColor="@color/status_online"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
 
     <!-- Network State Top Notification Banner -->
     <LinearLayout
