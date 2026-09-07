@@ -27,8 +27,8 @@ Orientation changes are handled without recreating `MainActivity`, so the loaded
 news list and the current `RecyclerView` scroll position are preserved and no RSS
 request is started again.
 
-The main header keeps the title/actions in the toolbar and shows network status in
-a dedicated row below it, preventing overlap on narrow screens and devices with
-status-bar insets.
+The main header uses a taller blue area: title/actions occupy the upper row and
+network status sits below them inside the same header, preventing overlap on
+narrow screens and devices with status-bar insets.
 
 This is an independent reader and is not an official elDiario.es application.

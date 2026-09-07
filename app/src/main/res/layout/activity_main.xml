@@ -8,13 +8,20 @@
     android:background="@color/bg_app"
     tools:context=".MainActivity">
 
-    <!-- Top Custom Toolbar -->
+    <!-- Taller blue header gives the title, actions and network status their own visual space. -->
+    <LinearLayout
+        android:id="@+id/headerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        android:orientation="vertical">
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        android:elevation="4dp"
+        android:layout_height="64dp"
+        android:background="@android:color/transparent"
         app:popupTheme="@style/Theme.AppCompat.Light">
 
         <RelativeLayout
@@ -30,18 +37,17 @@
                 android:layout_centerVertical="true"
                 android:text="Noticias elDiario.es"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
         </RelativeLayout>
 
     </android.support.v7.widget.Toolbar>
 
-    <!-- Dedicated status row avoids competing with the title and toolbar actions. -->
+    <!-- Status stays inside the blue header, below the title and actions. -->
     <LinearLayout
         android:id="@+id/networkStatusBar"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@color/bg_app"
+        android:layout_height="48dp"
         android:gravity="center_vertical|right"
         android:paddingLeft="16dp"
         android:paddingRight="16dp">
@@ -72,6 +78,8 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
+    </LinearLayout>
+
     </LinearLayout>
 
     <!-- Network State Top Notification Banner -->

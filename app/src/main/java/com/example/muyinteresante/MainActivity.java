@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
         setContentView(R.layout.activity_main);
 
         final Toolbar toolbar = findViewById(R.id.toolbar);
+        final View headerContainer = findViewById(R.id.headerContainer);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -100,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
                     int left = insets.getSystemWindowInsetLeft();
                     int right = insets.getSystemWindowInsetRight();
 
-                    if (toolbar != null && top > 0) {
-                        toolbar.setPadding(left, top, right, 0);
+                    if (headerContainer != null && top > 0) {
+                        headerContainer.setPadding(left, top, right, 0);
                     }
                     if (rvNoticias != null && bottom > 0) {
                         rvNoticias.setPadding(left, rvNoticias.getPaddingTop(), right, bottom + 12);
