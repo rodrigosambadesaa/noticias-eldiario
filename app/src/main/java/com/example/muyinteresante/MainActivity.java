@@ -1,6 +1,7 @@
 package com.example.muyinteresante;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.view.OnApplyWindowInsetsListener;
 import android.support.v4.view.ViewCompat;
@@ -401,6 +402,16 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
             Toast.makeText(this, "No se pudieron obtener nuevas noticias del canal RSS", Toast.LENGTH_SHORT).show();
             usarNoticiasOffline();
         }
+    }
+
+    /**
+     * Keep this activity instance across rotation so the adapter, its layout
+     * manager and current scroll position survive without starting RSS again.
+     */
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d(TAG, "Configuración cambiada; se conserva la lista y la posición de scroll.");
     }
 
     @Override

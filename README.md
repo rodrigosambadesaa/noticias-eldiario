@@ -23,4 +23,8 @@ without starting a remote task.
 
 Validation: `./gradlew :app:testDebugUnitTest :app:lintDebug`.
 
+Orientation changes are handled without recreating `MainActivity`, so the loaded
+news list and the current `RecyclerView` scroll position are preserved and no RSS
+request is started again.
+
 This is an independent reader and is not an official elDiario.es application.
