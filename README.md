@@ -33,5 +33,7 @@ narrow screens and devices with status-bar insets.
 
 When no usable network is detected, remote loading is skipped before showing any
 progress indicator and the app goes directly to cached/offline content.
+The network pill starts neutral, follows the passive network snapshot (including
+offline/disconnected state), and offline fallback does not stack duplicate Toasts.
 
 This is an independent reader and is not an official elDiario.es application.

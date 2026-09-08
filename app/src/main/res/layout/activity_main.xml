@@ -60,7 +60,7 @@
             android:id="@+id/layoutNetworkStatusPill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_status_badge"
+                android:background="@drawable/bg_status_neutral"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center_vertical"
@@ -71,14 +71,14 @@
                 android:layout_width="8dp"
                 android:layout_height="8dp"
                 android:layout_marginRight="6dp"
-                android:background="@color/status_online" />
+                    android:background="@color/text_secondary" />
 
             <TextView
                 android:id="@+id/tvNetworkStatusText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Online"
-                android:textColor="@color/status_online"
+                    android:text="Comprobando red"
+                    android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
