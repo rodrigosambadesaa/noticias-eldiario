@@ -78,7 +78,8 @@ public class DescargaNoticiasRSS extends AsyncTask<String,Integer,ArrayList<Noti
 	protected void onPreExecute() {
 		super.onPreExecute();
 		
-		if (contexto != null && !ConnectivityAndInternetAccess.isConnected(contexto)) {
+		if (contexto != null && (!ConnectivityAndInternetAccess.isConnected(contexto)
+				|| !ConnectivityAndInternetAccess.hasPhysicalNetwork(contexto))) {
 			remoteSkippedOffline = true;
 			fetchError = new FetchError(FailureKind.OFFLINE, 0, null);
 		} else if (contexto != null) {
@@ -127,7 +128,9 @@ public class DescargaNoticiasRSS extends AsyncTask<String,Integer,ArrayList<Noti
 		InputStream entrada = null;
 		
 		try{
-			if (remoteSkippedOffline || (contexto != null && !ConnectivityAndInternetAccess.isConnected(contexto))) {
+			if (remoteSkippedOffline || (contexto != null
+					&& (!ConnectivityAndInternetAccess.isConnected(contexto)
+					|| !ConnectivityAndInternetAccess.hasPhysicalNetwork(contexto)))) {
 				fetchError = new FetchError(FailureKind.OFFLINE, 0, null);
 				Log.w("DescargaNoticiasRSS", "Descarga cancelada: Dispositivo sin conexión según ConnectivityAndInternetAccess.");
 				return null;

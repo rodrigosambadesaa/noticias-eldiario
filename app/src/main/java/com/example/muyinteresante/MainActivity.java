@@ -201,7 +201,8 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
 
     private void actualizarInterfazEstadoRed(ConnectivityAndInternetAccess.NetworkState state) {
         // El snapshot pasivo recibido del observador es la fuente de verdad para la UI.
-        boolean isConnected = state != null && state.isConnected();
+        boolean isConnected = state != null && state.isConnected()
+                && ConnectivityAndInternetAccess.hasPhysicalNetwork(this);
         boolean isWifi = ConnectivityAndInternetAccess.isConnectedWifi(this);
         boolean isMobile = ConnectivityAndInternetAccess.isConnectedMobile(this);
         boolean isVpn = ConnectivityAndInternetAccess.vpnActive(this);
@@ -216,6 +217,8 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
 
         if (!isConnected) {
             // Disconnected / Offline
+            swipeRefreshLayout.setRefreshing(false);
+            isLoadingMore = false;
             actualizarFondoPill(R.color.status_offline_bg);
             viewNetworkDot.setBackgroundResource(R.color.status_offline);
             tvNetworkStatusText.setText(isAirplane ? "Modo Avión" : "Sin red");
@@ -432,6 +435,15 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
             return;
         }
 
+        // Si la red desapareció durante la petición, no lo presentamos como
+        // un fallo del feed ni lanzamos otro diagnóstico/toast.
+        if (!hayRedUtilizableParaNuevaPeticion()
+                && (error == null
+                || error.getKind() != DescargaNoticiasRSS.FailureKind.HTTP_STATUS)) {
+            usarNoticiasOffline();
+            return;
+        }
+
         if (error != null && ConnectivityRequestPolicy.shouldDiagnoseAfterFailure(
                 false, error.requiresGeneralDiagnostic())) {
             ConnectivityAndInternetAccess.checkInternetAsyncDefault(this,
@@ -468,6 +480,7 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
     private boolean hayRedUtilizableParaNuevaPeticion() {
         ConnectivityAndInternetAccess.NetworkState observed = currentNetworkState;
         return ConnectivityAndInternetAccess.isConnected(this)
+                && ConnectivityAndInternetAccess.hasPhysicalNetwork(this)
                 && (observed == null || observed.isConnected());
     }
 
@@ -479,11 +492,12 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
                 .show();
 
         // Chequeos estáticos rápidos de ConnectivityAndInternetAccess
-        boolean isConnectedOrConnecting = ConnectivityAndInternetAccess.isConnectedOrConnecting(this);
-        boolean isConnected = ConnectivityAndInternetAccess.isConnected(this);
-        boolean isWifi = ConnectivityAndInternetAccess.isConnectedWifi(this);
-        boolean isMobile = ConnectivityAndInternetAccess.isConnectedMobile(this);
-        boolean isFast = ConnectivityAndInternetAccess.isConnectedFast(this);
+        boolean isConnected = hayRedUtilizableParaNuevaPeticion();
+        boolean isConnectedOrConnecting = isConnected;
+        boolean hasPhysicalNetwork = ConnectivityAndInternetAccess.hasPhysicalNetwork(this);
+        boolean isWifi = hasPhysicalNetwork && ConnectivityAndInternetAccess.isConnectedWifi(this);
+        boolean isMobile = hasPhysicalNetwork && ConnectivityAndInternetAccess.isConnectedMobile(this);
+        boolean isFast = hasPhysicalNetwork && ConnectivityAndInternetAccess.isConnectedFast(this);
         boolean isVpn = ConnectivityAndInternetAccess.vpnActive(this);
         boolean isAirplane = ConnectivityAndInternetAccess.isAirplaneModeOn(this);
 
