@@ -43,7 +43,8 @@ public class AsignaImagenDeURL extends AsyncTask<String,Void,Void> {
 		super.onPreExecute();
 		mapaDeBits = null;
 		f = null;
-		if (contexto != null && !ConnectivityAndInternetAccess.isConnected(contexto)) {
+		if (contexto != null && (!ConnectivityAndInternetAccess.isConnected(contexto)
+				|| !ConnectivityAndInternetAccess.hasPhysicalNetwork(contexto))) {
 			remoteSkippedOffline = true;
 		} else if (contexto != null) {
 			ConnectivityAndInternetAccess.beginConnectionAttempt(contexto);
@@ -67,7 +68,8 @@ public class AsignaImagenDeURL extends AsyncTask<String,Void,Void> {
 					if (mapaDeBits != null) return null;
 				}
 
-				if (remoteSkippedOffline || (contexto != null && !ConnectivityAndInternetAccess.isConnected(contexto))) {
+				if (remoteSkippedOffline || (contexto != null && (!ConnectivityAndInternetAccess.isConnected(contexto)
+						|| !ConnectivityAndInternetAccess.hasPhysicalNetwork(contexto)))) {
 					return null;
 				}
 

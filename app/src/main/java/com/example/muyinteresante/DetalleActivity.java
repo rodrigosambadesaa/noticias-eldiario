@@ -117,7 +117,8 @@ public class DetalleActivity extends AppCompatActivity {
     }
 
     private void cargarArticuloSiHayRed() {
-        if (!ConnectivityAndInternetAccess.isConnected(this)) {
+        if (!ConnectivityAndInternetAccess.isConnected(this)
+                || !ConnectivityAndInternetAccess.hasPhysicalNetwork(this)) {
             Toast.makeText(this, "Sin conexión. No se puede cargar el artículo.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -139,7 +140,8 @@ public class DetalleActivity extends AppCompatActivity {
             return true;
         } else if (id == R.id.menu_actualizar) {
             if (webView != null) {
-                if (ConnectivityAndInternetAccess.isConnected(this)) {
+                if (ConnectivityAndInternetAccess.isConnected(this)
+                        && ConnectivityAndInternetAccess.hasPhysicalNetwork(this)) {
                     webView.reload();
                 } else {
                     Toast.makeText(this, "Sin conexión. No se puede actualizar el artículo.", Toast.LENGTH_SHORT).show();
