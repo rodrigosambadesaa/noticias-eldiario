@@ -19,6 +19,16 @@ public class ConnectivityRequestPolicyTest {
     }
 
     @Test
+    public void offlineRequestDoesNotShowProgress() {
+        assertFalse(ConnectivityRequestPolicy.shouldShowProgress(true));
+    }
+
+    @Test
+    public void connectedRequestMayShowProgress() {
+        assertTrue(ConnectivityRequestPolicy.shouldShowProgress(false));
+    }
+
+    @Test
     public void validHttpResponseNeverTriggersGeneralDiagnostic() {
         assertFalse(ConnectivityRequestPolicy.shouldDiagnoseAfterFailure(true, true));
     }

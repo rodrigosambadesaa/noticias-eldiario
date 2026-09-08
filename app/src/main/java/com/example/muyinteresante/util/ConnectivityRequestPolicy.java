@@ -9,6 +9,11 @@ public final class ConnectivityRequestPolicy {
         return usableNetwork;
     }
 
+    /** Offline requests must not expose a loading indicator before using cache. */
+    public static boolean shouldShowProgress(boolean remoteSkippedOffline) {
+        return !remoteSkippedOffline;
+    }
+
     public static boolean shouldDiagnoseAfterFailure(boolean validHttpResponse,
                                                      boolean ambiguousConnectivityFailure) {
         return !validHttpResponse && ambiguousConnectivityFailure;

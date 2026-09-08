@@ -31,4 +31,7 @@ The main header uses a taller, higher-contrast blue area: title/actions occupy t
 network status sits below them inside the same header, preventing overlap on
 narrow screens and devices with status-bar insets.
 
+When no usable network is detected, remote loading is skipped before showing any
+progress indicator and the app goes directly to cached/offline content.
+
 This is an independent reader and is not an official elDiario.es application.

@@ -22,6 +22,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.muyinteresante.util.ConnectivityAndInternetAccess;
+import com.example.muyinteresante.util.ConnectivityRequestPolicy;
 
 /* Parsea un canal RSS y devuelve sus items en un ArrayList */
 
@@ -86,7 +87,10 @@ public class DescargaNoticiasRSS extends AsyncTask<String,Integer,ArrayList<Noti
 			connectionAttemptStarted = true;
 		}
 		
-		if (mostrarProgreso && contexto != null) {
+		// Si el guard de conectividad ha descartado la operación, no mostramos
+		// ningún progreso: la actividad debe pasar directamente a caché/offline.
+		if (mostrarProgreso && contexto != null
+				&& ConnectivityRequestPolicy.shouldShowProgress(remoteSkippedOffline)) {
 			pd = new ProgressDialog(contexto);
 			pd.setMessage(MENSAJE_PD);
 			pd.setCancelable(true);
