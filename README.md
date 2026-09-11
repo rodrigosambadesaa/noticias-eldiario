@@ -16,8 +16,9 @@ Independent Android RSS reader for elDiario.es.
 
 The app keeps the passive network observer for UI state and uses `isConnected()`/the
 current `NetworkCapabilities` as a cheap gate. When the gate passes, RSS and article
-requests go directly to their real endpoint, preserving redirects, HTTP status handling,
-timeouts and exceptions. A general DNS/HTTP diagnosis is run only after an ambiguous
+requests go directly to their real endpoint, preserving redirects, HTTP status handling
+and exceptions. The RSS request does not impose an artificial connect/read timeout, so
+slow but usable mobile connections can complete; the user can still cancel it. A general DNS/HTTP diagnosis is run only after an ambiguous
 connectivity failure; a valid HTTP response is never followed by a redundant probe.
 
 Offline starts, refreshes, pagination and retries use the cached news and offline UI
