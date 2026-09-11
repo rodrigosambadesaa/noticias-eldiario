@@ -7,7 +7,9 @@ Independent Android RSS reader for elDiario.es.
 - RecyclerView list, search, pull-to-refresh, sharing and article view
 - Offline JSON and image cache
 - Passive network observation and explicit connectivity diagnostics
-- Complete ConnectivityAndInternetAccess gist vendored under third_party/connectivity
+- ConnectivityAndInternetAccess synchronized from the canonical gist revision
+  `3b0497e976765653a7467e3bd7d6bff28b96bd7c` (the compiled copy is under
+  `app/src/main/java/com/example/muyinteresante/util`)
 - Android API 16+ and Java 8
 
 ### Remote request policy
@@ -21,7 +23,7 @@ connectivity failure; a valid HTTP response is never followed by a redundant pro
 Offline starts, refreshes, pagination and retries use the cached news and offline UI
 without starting a remote task.
 
-Validation: `./gradlew :app:testDebugUnitTest :app:lintDebug`.
+Validation: `./gradlew :app:testDebugUnitTest :app:assembleDebug :app:lintDebug`.
 
 Orientation changes are handled without recreating `MainActivity`, so the loaded
 news list and the current `RecyclerView` scroll position are preserved and no RSS
