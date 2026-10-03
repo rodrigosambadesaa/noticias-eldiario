@@ -144,11 +144,10 @@ public class DescargaNoticiasRSS extends AsyncTask<String,Integer,ArrayList<Noti
 			 // Creamos objeto URL a partir de la direccion web para conectarnos con el servidor
 			URL url = new URL(params[0]);
 			URLConnection conex = url.openConnection(); // Abrimos la conexion
-			// La petición RSS real no tiene un timeout artificial: en redes móviles
-			// muy lentas debe poder completar mientras exista conectividad. El
-			// usuario conserva la posibilidad de cancelar el ProgressDialog.
-			conex.setConnectTimeout(0);
-			conex.setReadTimeout(0);
+			// Evitamos bloqueos indefinidos ante pérdidas silenciosas de conectividad
+			// o transiciones entre redes que dejen el socket en un agujero negro TCP.
+			conex.setConnectTimeout(15000);
+			conex.setReadTimeout(30000);
 			conex.setUseCaches(false); // Evitamos la cache de datos.
 			conex.setRequestProperty("accept", "application/rss+xml, application/xml, text/xml, */*");
 			conex.setRequestProperty("User-Agent", "Mozilla/5.0 (Android) noticias-eldiario/1.0");
