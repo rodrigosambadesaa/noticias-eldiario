@@ -45,7 +45,7 @@ public class DetalleActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle(articleTitle != null ? articleTitle : "Muy Interesante");
+            getSupportActionBar().setTitle(articleTitle != null ? articleTitle : getString(R.string.detail_fallback));
         }
 
         progressBar = findViewById(R.id.progressBarWeb);
@@ -111,7 +111,7 @@ public class DetalleActivity extends AppCompatActivity {
         if (articleUrl != null && !articleUrl.isEmpty()) {
             cargarArticuloSiHayRed();
         } else {
-            Toast.makeText(this, "URL no válida", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.invalid_url), Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -119,7 +119,7 @@ public class DetalleActivity extends AppCompatActivity {
     private void cargarArticuloSiHayRed() {
         if (!ConnectivityAndInternetAccess.isConnected(this)
                 || !ConnectivityAndInternetAccess.hasPhysicalNetwork(this)) {
-            Toast.makeText(this, "Sin conexión. No se puede cargar el artículo.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.article_offline), Toast.LENGTH_SHORT).show();
             return;
         }
         webView.loadUrl(articleUrl);
@@ -144,7 +144,7 @@ public class DetalleActivity extends AppCompatActivity {
                         && ConnectivityAndInternetAccess.hasPhysicalNetwork(this)) {
                     webView.reload();
                 } else {
-                    Toast.makeText(this, "Sin conexión. No se puede actualizar el artículo.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.article_refresh_offline), Toast.LENGTH_SHORT).show();
                 }
             }
             return true;
@@ -152,10 +152,10 @@ public class DetalleActivity extends AppCompatActivity {
             if (articleUrl != null && !articleUrl.isEmpty()) {
                 try {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(articleUrl));
-                    Intent chooser = Intent.createChooser(browserIntent, "Abrir noticia en...");
+                    Intent chooser = Intent.createChooser(browserIntent, getString(R.string.open_article_chooser));
                     startActivity(chooser);
                 } catch (Exception e) {
-                    Toast.makeText(this, "No se pudo abrir el navegador", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.browser_error), Toast.LENGTH_SHORT).show();
                 }
             }
             return true;

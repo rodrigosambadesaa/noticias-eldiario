@@ -1,7 +1,54 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Noticias elDiario.es</string>
     <string name="actualizar">Actualizar</string>
-
+    <string name="search_hint">Buscar noticia…</string>
+    <string name="status_airplane">Modo avión</string>
+    <string name="status_offline">Sin red</string>
+    <string name="banner_airplane">Modo avión activado. Mostrando noticias guardadas en caché.</string>
+    <string name="banner_offline">Dispositivo sin conexión a internet. Mostrando noticias guardadas en caché.</string>
+    <string name="status_captive">Portal cautivo</string>
+    <string name="banner_captive">Se requiere inicio de sesión en red (portal cautivo detectado).</string>
+    <string name="status_connecting">Conectando…</string>
+    <string name="banner_unvalidated">Conectado a la interfaz de red pero sin acceso verificado a internet.</string>
+    <string name="status_online">Online</string>
+    <string name="status_online_vpn">Online (VPN)</string>
+    <string name="status_online_wifi">Online (Wi-Fi)</string>
+    <string name="status_online_fast">Online (4G/5G)</string>
+    <string name="status_online_mobile">Online (móvil lento)</string>
+    <string name="no_more_news">No hay más noticias antiguas disponibles</string>
+    <string name="rss_error">No se pudieron obtener nuevas noticias del canal RSS</string>
+    <string name="feed_error">El feed de noticias no está disponible en este momento.</string>
+    <string name="diag_title">Diagnóstico de conectividad</string>
+    <string name="diag_progress">Ejecutando comprobación avanzada de red y sondeo activo DNS/HTTP…</string>
+    <string name="close">Cerrar</string>
+    <string name="diag_none">Ninguno</string>
+    <string name="diag_unavailable">No disponible</string>
+    <string name="diag_connected">Conectado</string>
+    <string name="diag_disconnected">Desconectado</string>
+    <string name="diag_wifi">Wi-Fi</string>
+    <string name="diag_mobile">Móvil / celular</string>
+    <string name="diag_other">Otra / ninguna</string>
+    <string name="diag_fast">Rápida (High Speed)</string>
+    <string name="diag_slow">Lenta / desconocida</string>
+    <string name="diag_yes">Sí</string>
+    <string name="diag_no">No</string>
+    <string name="diag_enabled">Activado</string>
+    <string name="diag_disabled">Desactivado</string>
+    <string name="diag_internet_yes">Sí (Internet verificado)</string>
+    <string name="diag_internet_no">No (sin Internet)</string>
+    <string name="diag_report">📡 ESTADO DE INTERFAZ DE RED:\n• Estado general: %1$s\n• Tipo de red: %2$s\n• Velocidad estimada: %3$s\n• Red VPN activa: %4$s\n• Modo avión: %5$s\n\n🔍 PRUEBA ACTIVA DNS/HTTP:\n• Internet real: %6$s\n• Servidor alcanzado: %7$s\n• Latencia de respuesta: %8$d ms\n\n📋 REGISTRO DE RED:\n%9$s</string>
+    <string name="detail_fallback">Noticias elDiario.es</string>
+    <string name="invalid_url">URL no válida</string>
+    <string name="article_offline">Sin conexión. No se puede cargar el artículo.</string>
+    <string name="article_refresh_offline">Sin conexión. No se puede actualizar el artículo.</string>
+    <string name="open_article_chooser">Abrir noticia en…</string>
+    <string name="browser_error">No se pudo abrir el navegador</string>
+    <string name="browser_article_error">No se pudo abrir la noticia en el navegador</string>
+    <string name="share_chooser">Compartir noticia mediante</string>
+    <string name="downloading_news">Descargando noticias…</string>
+    <string name="downloading_news_count">Descargando noticias… %1$d</string>
+    <string name="menu_search">Buscar noticia</string>
+    <string name="menu_browser">Abrir en navegador</string>
+    <string name="menu_diagnostic">Diagnóstico de red avanzado</string>
+    <string name="detail_label">Detalle de noticia</string>
 </resources>
