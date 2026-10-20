@@ -451,7 +451,7 @@ public class MainActivity extends AppCompatActivity implements iNoticiaRSS {
 
         if (error != null && ConnectivityRequestPolicy.shouldDiagnoseAfterFailure(
                 false, error.requiresGeneralDiagnostic())) {
-            ConnectivityAndInternetAccess.checkInternetAsyncDefault(this,
+            ConnectivityAndInternetAccess.checkHttpOnlyAsyncDefault(this,
                     new ConnectivityAndInternetAccess.InternetCallback() {
                         @Override
                         public void onResult(ConnectivityAndInternetAccess.InternetResult result) {
